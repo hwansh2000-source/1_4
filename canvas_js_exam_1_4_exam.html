@@ -1,0 +1,143 @@
+<!DOCTYPE html> 
+<html lang="en"> <!-- 기본언어 : 영어-->
+<head>
+    <meta charset="UTF-8" /> <!--페이지 언어 인코딩 형식-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!--화면크기에 따라 보여지는 크기 맞추기-->
+    <title>Web Animation(canvas_js_css)[1단원-3]</title> 
+    <style>
+        /* 페이지 전체 설정*/
+        body {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            font-family: sans-serif;
+        }
+        /* 애니메이션 화면 설정 */
+        #canvas {
+            background: #DCD7C9;
+            display: block;
+            margin: 0 auto;
+        }
+        /* PC에서는 600x600 고정 */
+        @media (min-width: 769px) {
+            #canvas {
+                width: 600px;
+                height: 600px;
+          }
+        }
+    </style> 
+</head>
+<body>
+    <!--애니메이션 화면 만들기-->
+    <canvas id="canvas"></canvas> 
+    <script>
+        // 캔버스 요소 JS 변수 만들기
+        const drawingBoard = document.getElementById('canvas'); 
+        // 캔버스에 2D그림을 그리는 도구 변수만들기
+        const drawingPen = drawingBoard.getContext('2d'); 
+
+        // 캔버스 크기를 CSS와 맞춰줌 (중요!)
+        drawingBoard.width = drawingBoard.clientWidth; 
+        drawingBoard.height = drawingBoard.clientHeight; 
+
+        //화면 가운데 위치
+        let x = 20; 
+        let y = drawingBoard.height - 20;
+
+        //주인공 이동속도
+        const moveAmount = 5; 
+
+        let enemyX = 300;
+        let enemyY = 300;
+        const enemySize = 20;
+        let enemyVisible = true; // 충돌 시 false로 변경
+
+        //주인공 이동함수
+        function moveRight() {
+            x = x + moveAmount;
+        }
+
+        function moveLeft() {
+            x = x - moveAmount;
+        }
+
+        function moveDown() {
+            y = y + moveAmount;
+        }
+
+        function moveUp() {
+            y = y - moveAmount;
+        }
+        // ★1_4 : 주인공 이동제한
+        function move_limit(){
+            if (x < 0){ //왼쪽이동제한
+                x=0;
+            }
+            if (x > 590){
+                x=590;
+            }
+            if(y < 0){
+                y=0;
+            }
+            if(y > 590){
+                y=590;
+            }
+
+
+
+        }
+        // ★1_4 : 캔버스 왼쪽 상당에 텍스트 출력함수
+        function drawCoordinate() {
+            drawingPen.fillStyle = 'black';
+            drawingPen.foot = '10px sans-serif';
+            drawingPen.fillText(`x: ${x} y: ${y}`, 10, 20); //★1_4 : 주인공 좌표출력
+        }
+        //주인공출력함수
+        function drawHere() {
+            drawingPen.fillStyle = 'black';
+            drawingPen.fillRect(x, y, 10, 10);
+        }
+          function enemy1() {
+            if (enemyVisible) {
+                drawingPen.fillStyle = 'red';
+                drawingPen.fillRect(enemyX, enemyY, enemySize, enemySize);
+            }
+        }
+         function collision1() {
+            if (!enemyVisible) return;
+
+            if (
+                x < enemyX + enemySize &&
+                x + 10 > enemyX &&
+                y < enemyY + enemySize &&
+                y + 10 > enemyY
+            ) {
+                enemyVisible = false; // 충돌 시 적 사라짐
+            }
+        }
+        // 화면에 출력하기
+        function draw() {
+            drawingPen.fillText(`x: ${x} y: ${y}`, 10, 20); //★1_4 : 캔버스 왼쪽 상단에 텍스트 출력
+            drawingPen.clearRect(0, 0, canvas.width, canvas.height); //화면지우기
+            drawHere(); //주인공출력함수호출
+
+            move_limit(); //★1_4 : 주인공 이동제한 함수호출
+            drawCoordinate(); //★1_4 : 텍스트 출력 함수호출
+            enemy1();        // 🔴 적 그리기 호출
+            collision1();  
+        }
+       
+        setInterval(draw, 16); // 60FPS
+        
+        // PC 방향키 조작
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft' : moveLeft(); break; 
+                case 'ArrowRight' : moveRight(); break; 
+                case 'ArrowUp' : moveUp(); break; 
+                case 'ArrowDown' : moveDown(); break; 
+            }
+        });
+    </script>
+</body>
+</html>
